@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101522">
+<title>Robert AI</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#101522;color:white;
+ font-family:Arial,sans-serif;padding:24px;
+}
+main{max-width:650px;margin:40px auto}
+header{text-align:center;margin-bottom:35px}
+h1{font-size:38px;letter-spacing:4px}
+.status{color:#54dfa0}
+#chat{
+ height:350px;overflow:auto;background:#1b2435;
+ border-radius:16px;padding:16px;margin-bottom:15px;
+}
+.msg{padding:12px;margin:8px 0;border-radius:12px;
+ background:#303c52;overflow-wrap:anywhere}
+.user{background:#284b65}
+.controls{display:flex;gap:8px}
+input{
+ flex:1;min-width:0;padding:14px;border-radius:12px;
+ border:0;background:#273247;color:white;font-size:16px
+}
+button{
+ padding:13px;border:0;border-radius:12px;
+ background:#3978df;color:white;font-weight:bold
+}
+.small{color:#aab6c9;text-align:center;font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>ROBERT AI</h1>
+<p class="status">● Sistem arayüzü hazır</p>
+<p>Merhaba efendim. Robert hazır.</p>
+</header>
+
+<div id="chat">
+<div class="msg">Merhaba efendim. İlk sürümüm açıldı!</div>
+</div>
+
+<div class="controls">
+<input id="message" placeholder="Robert'a yazın...">
+<button onclick="send()">Gönder</button>
+</div>
+<br>
+<div class="controls">
+<button onclick="listen()">🎙️ Konuş</button>
+<button onclick="speak()">🔊 Son cevabı oku</button>
+</div>
+<p class="small" id="status">Robert ilk geliştirme sürümünde.</p>
+</main>
+
+<script>
+const chat=document.getElementById("chat");
+const input=document.getElementById("message");
+let lastReply="Merhaba efendim. Robert hazır.";
+
+function add(text,who){
+ const el=document.createElement("div");
+ el.className="msg "+who;
+ el.textContent=text;
+ chat.appendChild(el);
+ chat.scrollTop=chat.scrollHeight;
+}
+
+function send(){
+ const value=input.value.trim();
+ if(!value)return;
+ add(value,"user");
+ input.value="";
+ lastReply="Mesajınızı aldım efendim. Yapay zekâ bağlantım henüz kurulmadı.";
+ add(lastReply,"");
+}
+
+function speak(){
+ if(!("speechSynthesis" in window)){
+  document.getElementById("status").textContent=
+  "Bu tarayıcı sesli okumayı desteklemiyor.";
+  return;
+ }
+ speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(lastReply);
+ utterance.lang="tr-TR";
+ speechSynthesis.speak(utterance);
+}
+
+function listen(){
+ const Recognition=window.SpeechRecognition||
+ window.webkitSpeechRecognition;
+ if(!Recognition){
+  document.getElementById("status").textContent=
+  "Bu tarayıcıda ses tanıma desteklenmiyor.";
+  return;
+ }
+ const recognition=new Recognition();
+ recognition.lang="tr-TR";
+ recognition.onresult=e=>{
+  input.value=e.results[0][0].transcript;
+ };
+ recognition.onerror=()=>{
+  document.getElementById("status").textContent=
+  "Mikrofon kullanılamadı.";
+ };
+ recognition.start();
+}
+</script>
+</body>
+</html>
